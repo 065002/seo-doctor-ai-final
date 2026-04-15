@@ -2,13 +2,27 @@ import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 
-st.set_page_config(page_title="SEO Doctor AI")
+# Page config
+st.set_page_config(page_title="SEO Doctor AI", layout="wide")
 
-st.title("🔍 SEO Doctor AI")
-st.write("Analyze your website SEO easily")
+# Custom styling
+st.markdown("""
+<style>
+.big-title {
+    font-size:40px !important;
+    font-weight:700;
+}
+</style>
+""", unsafe_allow_html=True)
 
+# Title
+st.markdown('<p class="big-title">🔍 SEO Doctor AI</p>', unsafe_allow_html=True)
+st.caption("Analyze your website like a pro 🚀")
+
+# Input
 url = st.text_input("Enter Website URL (with https://)")
 
+# Scraper function
 def scrape(url):
     try:
         headers = {"User-Agent": "Mozilla/5.0"}
@@ -31,36 +45,82 @@ def scrape(url):
         return None, None, None, None
 
 
+# Main button
 if st.button("Analyze"):
 
     if not url.startswith("http"):
         st.error("Enter valid URL (with http/https)")
     else:
-        title, meta_desc, word_count, images = scrape(url)
+        with st.spinner("Analyzing website..."):
 
-        if title is None:
-            st.error("Unable to fetch website")
-        else:
-            issues = []
+            title, meta_desc, word_count, images = scrape(url)
 
-            if len(title) < 50:
-                issues.append("Title too short")
+            if title is None:
+                st.error("Unable to fetch website")
+            else:
+                issues = []
 
-            if meta_desc == "No meta description":
-                issues.append("Meta description missing")
+                # SEO checks
+                if len(title) < 50:
+                    issues.append("Title too short")
 
-            if word_count < 300:
-                issues.append("Content too short")
+                if meta_desc == "No meta description":
+                    issues.append("Meta description missing")
 
-            missing_alt = sum(1 for img in images if not img.get("alt"))
-            if missing_alt > 0:
-                issues.append(f"{missing_alt} images missing ALT tags")
+                if word_count < 300:
+                    issues.append("Content too short")
 
-            score = max(100 - len(issues)*10, 0)
+                missing_alt = sum(1 for img in images if not img.get("alt"))
+                if missing_alt > 0:
+                    issues.append(f"{missing_alt} images missing ALT tags")
 
-            st.subheader("SEO Score")
-            st.success(f"{score}/100")
+                score = max(100 - len(issues)*10, 0)
 
-            st.subheader("Issues")
-            for i in issues:
-                st.write("❌", i)
+                # Dashboard
+                st.subheader("📊 Dashboard")
+
+                col1, col2, col3, col4 = st.columns(4)
+
+                col1.metric("SEO Score", f"{score}/100")
+                col2.metric("Word Count", word_count)
+                col3.metric("Images", len(images))
+                col4.metric("Issues", len(issues))
+
+                st.progress(score / 100)
+
+                # Website overview
+                st.subheader("🌐 Website Overview")
+                st.write("**Title:**", title)
+                st.write("**Meta Description:**", meta_desc[:150])
+
+                # Issues
+                st.subheader("❌ Issues Found")
+
+                if issues:
+                    for i in issues:
+                        st.write("❌", i)
+                else:
+                    st.write("No major issues 🎉")
+
+                # Insights
+                st.subheader("🔍 SEO Insight")
+
+                if score > 80:
+                    st.success("Your website SEO is strong 👍")
+                elif score > 50:
+                    st.warning("Your website needs improvement ⚠️")
+                else:
+                    st.error("Your website has poor SEO ❌")
+
+                # Recommendations
+                st.subheader("💡 Recommendations")
+
+                for issue in issues:
+                    if "Title" in issue:
+                        st.write("👉 Improve title length to 50–60 characters")
+                    elif "Meta" in issue:
+                        st.write("👉 Add meta description (150–160 characters)")
+                    elif "Content" in issue:
+                        st.write("👉 Increase content depth (800+ words)")
+                    elif "ALT" in issue:
+                        st.write("👉 Add ALT text to images for SEO")
