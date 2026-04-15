@@ -112,15 +112,24 @@ if st.button("Analyze"):
                 else:
                     st.error("Your website has poor SEO ❌")
 
-                # Recommendations
+                # Detailed + Crisp Recommendations
                 st.subheader("💡 Recommendations")
 
-                for issue in issues:
-                    if "Title" in issue:
-                        st.write("👉 Improve title length to 50–60 characters")
-                    elif "Meta" in issue:
-                        st.write("👉 Add meta description (150–160 characters)")
-                    elif "Content" in issue:
-                        st.write("👉 Increase content depth (800+ words)")
-                    elif "ALT" in issue:
-                        st.write("👉 Add ALT text to images for SEO")
+                if issues:
+
+                    for issue in issues:
+
+                        if "Title" in issue:
+                            st.write("👉 **Title Optimization:** Keep it 50–60 characters and include your main keyword at the beginning.")
+
+                        elif "Meta" in issue:
+                            st.write("👉 **Meta Description:** Write a 150–160 character summary that clearly explains your page and attracts clicks.")
+
+                        elif "Content" in issue:
+                            st.write("👉 **Content Improvement:** Expand content to 800–1000 words with headings, examples, and useful information.")
+
+                        elif "ALT" in issue:
+                            st.write("👉 **Image SEO:** Add descriptive ALT text to images to improve search visibility and accessibility.")
+
+                else:
+                    st.write("Your website follows good SEO practices 👍")
